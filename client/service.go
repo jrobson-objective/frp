@@ -124,13 +124,10 @@ func (svr *Service) Run() error {
 
 	if svr.cfg.AdminPort != 0 {
 		// Init admin server assets
-		err := assets.Load(svr.cfg.AssetsDir)
-		if err != nil {
-			return fmt.Errorf("Load assets error: %v", err)
-		}
+		assets.Load(svr.cfg.AssetsDir)
 
 		address := net.JoinHostPort(svr.cfg.AdminAddr, strconv.Itoa(svr.cfg.AdminPort))
-		err = svr.RunAdminServer(address)
+		err := svr.RunAdminServer(address)
 		if err != nil {
 			log.Warn("run admin server error: %v", err)
 		}
@@ -232,7 +229,7 @@ func (svr *Service) login() (conn net.Conn, session *fmux.Session, err error) {
 	}
 
 	address := net.JoinHostPort(svr.cfg.ServerAddr, strconv.Itoa(svr.cfg.ServerPort))
-	conn, err = frpNet.ConnectServerByProxyWithTLS(svr.cfg.HTTPProxy, svr.cfg.Protocol, address, tlsConfig)
+	conn, err = frpNet.ConnectServerByProxyWithTLS(svr.cfg.HTTPProxy, svr.cfg.Protocol, address, tlsConfig, svr.cfg.DisableCustomTLSFirstByte)
 	if err != nil {
 		return
 	}
